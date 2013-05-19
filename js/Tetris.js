@@ -41,7 +41,7 @@ Tetris.init = function() {
         width: 360,
         height: 360,
         depth: 1200,
-        splitX: 6,  // x 轴方向曲面划分为6个
+        splitX: 6,      // x 轴方向曲面划分为6个
         splitY: 6,
         splitZ: 20
     };
@@ -75,6 +75,8 @@ Tetris.start = function(){
     document.getElementById("menu").style.display = "none";
     Tetris.pointsDOM = document.getElementById("points");
     Tetris.pointsDOM.style.display = "block";
+    if(Tetris.Block.shapes);
+    Tetris.Block.generate();
     Tetris.animate();
 }
 Tetris.animate = function() {
@@ -84,8 +86,8 @@ Tetris.animate = function() {
     Tetris.cumulatedFrameTime += Tetris.frameTime;
 
     while(Tetris.cumulatedFrameTime > Tetris.gameStepTime) {
-        // block movement will go here
         Tetris.cumulatedFrameTime -= Tetris.gameStepTime;
+        Tetris.Block.move(0,0,-1);
     }
 
     Tetris.renderer.render(Tetris.scene, Tetris.camera);
@@ -95,3 +97,44 @@ Tetris.animate = function() {
     if(!Tetris.gameOver) window.requestAnimationFrame(Tetris.animate);
 }
 window.addEventListener("load", Tetris.init);
+window.addEventListener("keydown", function(event){
+    var key = event.which ? event.which : event.keyCode;
+    switch(key) {
+    case 38: // up (arrow)
+    Tetris.Block.move(0, 1, 0);
+    break;
+    case 40: // down (arrow)
+    Tetris.Block.move(0, -1, 0);
+    break;
+    case 37: // left(arrow)
+    Tetris.Block.move(-1, 0, 0);
+    break;
+    case 39: // right (arrow)
+    Tetris.Block.move(1, 0, 0);
+    break;
+    case 32: // space
+    Tetris.Block.move(0, 0, -1);
+    break;
+
+    case 87: // up (w)
+    Tetris.Block.rotate(90, 0, 0);
+    break;
+    case 83: // down (s)
+    Tetris.Block.rotate(-90, 0, 0);
+    break;
+
+    case 65: // left(a)
+    Tetris.Block.rotate(0, 0, 90);
+    break;
+    case 68: // right (d)
+    Tetris.Block.rotate(0, 0, -90);
+    break;
+
+    case 81: // (q)
+    Tetris.Block.rotate(0, 90, 0);
+    break;
+    case 69: // (e)
+    Tetris.Block.rotate(0, -90, 0);
+    break;
+    }
+},false);
