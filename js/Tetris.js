@@ -10,6 +10,7 @@ if ( !window.requestAnimationFrame ) {
             };
             })();
 }
+Tetris.sounds = {};
 // wensixing
 Tetris.init = function() {
     var WIDTH  = window.innerWidth,
@@ -56,6 +57,8 @@ Tetris.init = function() {
             );
     Tetris.scene.add(boundingBox);
     Tetris.renderer.render(Tetris.scene, Tetris.camera);
+    Tetris.Board.init(boundingBoxConfig.splitX, boundingBoxConfig.splitY, boundingBoxConfig.splitZ);
+
     Tetris.stats = new Stats();
     Tetris.stats.domElement.style.position = 'absolute';
     Tetris.stats.domElement.style.top = '10px';
@@ -70,8 +73,15 @@ Tetris.init = function() {
     Tetris.cumulatedFrameTime = 0; // ms
     Tetris._lastFrameTime = Date.now(); // timestamp
     Tetris.gameOver = false;
+    Tetris.sounds["theme"] = document.getElementById("audio_theme");
+    Tetris.sounds["collision"] = document.getElementById("audio_collision");
+    Tetris.sounds["move"] = document.getElementById("audio_move");
+    Tetris.sounds["gameover"] = document.getElementById("audio_gameover");
+    Tetris.sounds["score"] = document.getElementById("audio_score");
+    Tetris.sounds["theme"].play();
 }
 Tetris.start = function(){
+    Tetris.sounds["theme"].pause();
     document.getElementById("menu").style.display = "none";
     Tetris.pointsDOM = document.getElementById("points");
     Tetris.pointsDOM.style.display = "block";
@@ -96,6 +106,8 @@ Tetris.animate = function() {
 
     if(!Tetris.gameOver) window.requestAnimationFrame(Tetris.animate);
 }
+
+
 window.addEventListener("load", Tetris.init);
 window.addEventListener("keydown", function(event){
     var key = event.which ? event.which : event.keyCode;
