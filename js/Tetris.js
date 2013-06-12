@@ -31,7 +31,10 @@ Tetris.init = function() {
 
     // the camera starts at 0,0,0 so pull it back
     Tetris.camera.position.z = 600;
+    Tetris.camera.lookAt(new THREE.Vector3( 0, 0, 0 ));
+
     Tetris.scene.add(Tetris.camera);
+
 
     // start the renderer
     Tetris.renderer.setSize(WIDTH, HEIGHT);
@@ -85,7 +88,7 @@ Tetris.start = function(){
     document.getElementById("menu").style.display = "none";
     Tetris.pointsDOM = document.getElementById("points");
     Tetris.pointsDOM.style.display = "block";
-    if(Tetris.Block.shapes);
+//    document.body.addEventListener('mousedown',onDocumentMouseDown,false);
     Tetris.Block.generate();
     Tetris.animate();
 }
@@ -104,10 +107,77 @@ Tetris.animate = function() {
 
     Tetris.stats.update();
 
+    Tetris.check_camera();
     if(!Tetris.gameOver) window.requestAnimationFrame(Tetris.animate);
 }
+Tetris.change_view = false;
+Tetris.view_mode = false;
+Tetris.speed = {"x":0,"y":0,"z":0,'set':false};
+Tetris.target = {"x":0,"y":0,"z":600};
 
+Tetris.change_camera = function(x,y,z){
+    Tetris.change_view = true;
+    Tetris.target['x'] = x;
+    Tetris.target['y'] = y;
+    Tetris.target['z'] = z;
+    if(!Tetris.speed['set']){
+        if(Tetris.camera.position.x != Tetris.target['x']){
+            Tetris.speed['x'] = (Tetris.target['x'] - Tetris.camera.position.x)/120;
+        }
+        if(Tetris.camera.position.y != Tetris.target['y']){
+            Tetris.speed['y'] = (Tetris.target['y'] - Tetris.camera.position.y)/120;
+        }
+        if(Tetris.camera.position.z != Tetris.target['z']){
+            Tetris.speed['z'] = (Tetris.target['z'] - Tetris.camera.position.z)/120;
+        }
+        console.log("x :"+ Tetris.speed['x']);
+        console.log("y :"+ Tetris.speed['y']);
+        console.log("z :"+ Tetris.speed['z']);
+        Tetris.speed['set'] = true;
+    }
+}
 
+Tetris.check_camera = function(){
+    if(Tetris.change_view){
+        if(Tetris.camera.position.x != Tetris.target['x']){
+            Tetris.camera.position.x += Tetris.speed['x'];
+        }
+        if(Tetris.camera.position.y != Tetris.target['y']){
+            Tetris.camera.position.y += Tetris.speed['y'];
+        }
+        if(Tetris.camera.position.z != Tetris.target['z']){
+            Tetris.camera.position.z += Tetris.speed['z'];
+        }
+        if(Tetris.camera.position.x == Tetris.target['x'] &&
+           Tetris.camera.position.y == Tetris.target['y'] &&
+           Tetris.camera.position.z == Tetris.target['z']){
+            Tetris.change_view  = false;
+            Tetris.speed['set'] = false;
+            Tetris.speed['x']   = 0;
+            Tetris.speed['y']   = 0;
+            Tetris.speed['z']   = 0;
+        }
+        Tetris.camera.lookAt(new THREE.Vector3( 0, 0, 0 ));
+    }
+}
+
+//function onDocumentMouseDown(event){
+//    event.preventDefault();
+//    document.body.addEventListener('mousemove', onDocumentMouseMove, false);
+//    document.body.addEventListener('mouseup',   onDocumentMouseUp,  false);
+//    event.clientX;
+//}
+//function onDocumentMouseMove(event){
+//    // caculate camera
+//    mouseX = event.clientX - windowHalfX;
+//    targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
+//}
+//function onDocumentMouseUp(event){
+//    document.body.removeEventListener('mousedown',  onDocumentMouseDown,false);
+//    document.body.removeEventListener('mouseup',    onDocumentMouseUp,  false);
+//    document.body.removeEventListener('mousemove',  onDocumentMouseMove,false);
+//}
+//
 window.addEventListener("load", Tetris.init);
 window.addEventListener("keydown", function(event){
     var key = event.which ? event.which : event.keyCode;
@@ -145,8 +215,29 @@ window.addEventListener("keydown", function(event){
     case 81: // (q)
     Tetris.Block.rotate(0, 90, 0);
     break;
+
     case 69: // (e)
     Tetris.Block.rotate(0, -90, 0);
+    break;
+
+    case 86: // (v)
+    if(Tetris.view_mode){
+        Tetris.view_mode = false;
+        console.log('view off');
+    }else{
+        Tetris.view_mode = true;
+        console.log('view on');
+    }
+    break;
+    case 48: // 0
+    if(Tetris.view_mode){
+        Tetris.change_camera(0,0,600);
+    }
+    break;
+    case 49: // 1
+    if(Tetris.view_mode){
+        Tetris.change_camera(720,0,0);
+    }
     break;
     }
 },false);
