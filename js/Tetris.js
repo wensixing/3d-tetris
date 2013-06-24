@@ -100,7 +100,9 @@ Tetris.animate = function() {
 
     while(Tetris.cumulatedFrameTime > Tetris.gameStepTime) {
         Tetris.cumulatedFrameTime -= Tetris.gameStepTime;
-        Tetris.Block.move(0,0,-1);
+        if(!Tetris.view_mode){
+            Tetris.Block.move(0,0,-1);
+        }
     }
 
     Tetris.renderer.render(Tetris.scene, Tetris.camera);
@@ -237,6 +239,11 @@ window.addEventListener("keydown", function(event){
     case 49: // 1
     if(Tetris.view_mode){
         Tetris.change_camera(720,0,0);
+    }
+    break;
+    case 50: // 2
+    if(Tetris.view_mode){
+        Tetris.change_camera(0,720,0);
     }
     break;
     }
